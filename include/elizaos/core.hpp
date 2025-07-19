@@ -603,4 +603,7 @@ public:
     virtual std::unordered_map<std::string, std::string> get(const State& state, std::shared_ptr<Memory> message) = 0;
 };
 
+// Utility functions
+std::string generateUUID();
+
 } // namespace elizaos

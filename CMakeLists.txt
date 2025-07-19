@@ -51,6 +51,9 @@ add_subdirectory(cpp/core)           # Core data structures and interfaces
 add_subdirectory(cpp/agentloop)      # Main event loop
 add_subdirectory(cpp/agentmemory)    # Memory management
 
+# Stage 5 - Learning and Adaptation (NEW)
+add_subdirectory(cpp/evolutionary)   # MOSES-style evolutionary search
+
 # Stage 2 - Infrastructure (COMPLETE + new additions)
 add_subdirectory(cpp/agentcomms)     # Communications
 add_subdirectory(cpp/agentlogger)    # Logging system
@@ -116,6 +119,23 @@ target_link_libraries(stage4_demo
     elizaos-agentlogger
     elizaos-ljspeechtools
     elizaos-livevideochat
+    elizaos-evolutionary
+    Threads::Threads
+)
+
+# Stage 5 Demo
+add_executable(stage5_demo
+    demo_stage5.cpp
+)
+
+target_include_directories(stage5_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(stage5_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-evolutionary
     Threads::Threads
 )
 
@@ -129,6 +149,9 @@ install(TARGETS
     # Stage 1-2 - Core and Infrastructure
     elizaos-core elizaos-agentloop elizaos-agentmemory
     elizaos-agentcomms elizaos-agentlogger elizaos-agentshell
+    
+    # Stage 5 - Learning and Adaptation
+    elizaos-evolutionary
     
     # Stage 3 - Application-specific
     elizaos-agentaction elizaos-agentagenda elizaos-agentbrowser

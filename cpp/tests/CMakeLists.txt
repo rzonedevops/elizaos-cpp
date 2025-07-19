@@ -10,6 +10,7 @@ add_executable(elizaos_tests
     src/test_agentagenda.cpp
     src/test_ljspeechtools.cpp
     src/test_livevideochat.cpp
+    src/test_evolutionary.cpp
 )
 
 target_include_directories(elizaos_tests PRIVATE
@@ -26,6 +27,7 @@ target_link_libraries(elizaos_tests
     elizaos-agentagenda
     elizaos-ljspeechtools
     elizaos-livevideochat
+    elizaos-evolutionary
     gtest_main
     gmock_main
     Threads::Threads
