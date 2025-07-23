@@ -16,7 +16,7 @@
         "@hookform/resolvers": "^3.3.2",
         "@iconify-json/heroicons": "^1.1.15",
         "@types/uuid": "^10.0.0",
-        "axios": "^1.10.0",
+        "axios": "^1.11.0",
         "eventemitter3": "^5.0.1",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
