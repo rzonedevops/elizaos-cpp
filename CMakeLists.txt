@@ -72,6 +72,9 @@ add_subdirectory(cpp/agentmemory)    # Memory management
 # Stage 5 - Learning and Adaptation (NEW)
 add_subdirectory(cpp/evolutionary)   # MOSES-style evolutionary search
 
+# Stage 6 - Embodiment & Integration (NEW)
+add_subdirectory(cpp/embodiment)     # Sensory/motor interfaces and perception-action loop
+
 # Stage 2 - Infrastructure (COMPLETE + new additions)
 add_subdirectory(cpp/agentcomms)     # Communications
 add_subdirectory(cpp/agentlogger)    # Logging system
@@ -138,6 +141,7 @@ target_link_libraries(stage4_demo
     elizaos-ljspeechtools
     elizaos-livevideochat
     elizaos-evolutionary
+    elizaos-embodiment
     Threads::Threads
 )
 
@@ -157,6 +161,26 @@ target_link_libraries(stage5_demo
     elizaos-website
     elizaos-elizaos_github_io
     elizaos-vercel_api
+    elizaos-embodiment
+    Threads::Threads
+)
+
+# Stage 6 Demo
+add_executable(stage6_demo
+    demo_stage6.cpp
+)
+
+target_include_directories(stage6_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(stage6_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-agentloop
+    elizaos-agentmemory
+    elizaos-agentaction
+    elizaos-embodiment
     Threads::Threads
 )
 
@@ -173,6 +197,9 @@ install(TARGETS
     
     # Stage 5 - Learning and Adaptation
     elizaos-evolutionary
+    
+    # Stage 6 - Embodiment & Integration
+    elizaos-embodiment
     
     # Stage 3 - Application-specific
     elizaos-agentaction elizaos-agentagenda elizaos-agentbrowser

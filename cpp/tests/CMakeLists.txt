@@ -12,6 +12,7 @@ add_executable(elizaos_tests
     src/test_livevideochat.cpp
     src/test_evolutionary.cpp
     src/test_stage6_automation.cpp
+    src/test_embodiment.cpp
 )
 
 target_include_directories(elizaos_tests PRIVATE
@@ -29,6 +30,7 @@ target_link_libraries(elizaos_tests
     elizaos-ljspeechtools
     elizaos-livevideochat
     elizaos-evolutionary
+    elizaos-embodiment
     elizaos-plugins_automation
     elizaos-discord_summarizer
     elizaos-discrub_ext
