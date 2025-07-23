@@ -1,6 +1,6 @@
-# Stage 6 - Tools and Automation placeholder - implementation planned
+# Stage 6 - Tools and Automation - Plugins Automation
 add_library(elizaos-plugins_automation STATIC
-    src/placeholder.cpp
+    src/plugins_automation.cpp
 )
 
 target_include_directories(elizaos-plugins_automation PUBLIC
@@ -9,4 +9,6 @@ target_include_directories(elizaos-plugins_automation PUBLIC
 
 target_link_libraries(elizaos-plugins_automation 
     elizaos-core
+    elizaos-agentlogger
+    Threads::Threads
 )

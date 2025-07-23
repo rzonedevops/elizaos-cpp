@@ -1,6 +1,6 @@
-# Stage 6 - Tools and Automation placeholder - implementation planned
+# Stage 6 - Tools and Automation - Discord Summarizer
 add_library(elizaos-discord_summarizer STATIC
-    src/placeholder.cpp
+    src/discord_summarizer.cpp
 )
 
 target_include_directories(elizaos-discord_summarizer PUBLIC
@@ -9,4 +9,6 @@ target_include_directories(elizaos-discord_summarizer PUBLIC
 
 target_link_libraries(elizaos-discord_summarizer 
     elizaos-core
+    elizaos-agentlogger
+    Threads::Threads
 )

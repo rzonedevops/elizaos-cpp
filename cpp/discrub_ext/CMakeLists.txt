@@ -1,6 +1,6 @@
-# Stage 6 - Tools and Automation placeholder - implementation planned
+# Stage 6 - Tools and Automation - Discrub Extension
 add_library(elizaos-discrub_ext STATIC
-    src/placeholder.cpp
+    src/discrub_ext.cpp
 )
 
 target_include_directories(elizaos-discrub_ext PUBLIC
@@ -9,4 +9,7 @@ target_include_directories(elizaos-discrub_ext PUBLIC
 
 target_link_libraries(elizaos-discrub_ext 
     elizaos-core
+    elizaos-agentlogger
+    elizaos-discord_summarizer
+    Threads::Threads
 )
