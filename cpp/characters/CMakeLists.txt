@@ -1,4 +1,4 @@
-# Stage 3 - Application-specific placeholder - implementation planned
+# Stage 3 - Application-specific - Character Management System
 add_library(elizaos-characters STATIC
     src/placeholder.cpp
 )
@@ -9,4 +9,8 @@ target_include_directories(elizaos-characters PUBLIC
 
 target_link_libraries(elizaos-characters 
     elizaos-core
+    elizaos-agentmemory
+    elizaos-agentlogger
+    elizaos-agentaction
+    Threads::Threads
 )
