@@ -87,7 +87,7 @@ jobs:
     
     - name: Generate Progress Report
       run: |
-        cat > progress_report.md << 'EOF'
+        cat > progress_report.md << EOF
         # 📊 ElizaOS C++ Implementation Progress Report
         
         **Generated**: $(date -u +"%Y-%m-%d %H:%M UTC")
@@ -115,7 +115,7 @@ jobs:
           echo "*None yet*" >> progress_report.md
         fi
         
-        cat >> progress_report.md << 'EOF'
+        cat >> progress_report.md << EOF
         
         ## 🟡 Partially Implemented Modules
         EOF
@@ -128,7 +128,7 @@ jobs:
           echo "*None*" >> progress_report.md
         fi
         
-        cat >> progress_report.md << 'EOF'
+        cat >> progress_report.md << EOF
         
         ## 🚧 Placeholder Only Modules (Implementation Needed)
         EOF
@@ -141,7 +141,7 @@ jobs:
           echo "*All modules implemented!* 🎉" >> progress_report.md
         fi
         
-        cat >> progress_report.md << 'EOF'
+        cat >> progress_report.md << EOF
         
         ## 🎯 Next Priority Implementations
         
@@ -185,12 +185,12 @@ jobs:
           });
           
           if (issues.data.length > 0) {
-            // Update existing tracking issue
-            await github.rest.issues.createComment({
+            // Update existing tracking issue body
+            await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issues.data[0].number,
-              body: `## Implementation Progress Update\n\n${report}`
+              body: `# Implementation Progress Tracking\n\nThis issue tracks the ongoing progress of converting placeholder modules to full implementations.\n\n${report}`
             });
           } else {
             // Create new tracking issue
