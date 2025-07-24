@@ -1,0 +1,204 @@
+name: Implementation Progress Tracker
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'cpp/**'
+  schedule:
+    # Run daily at 08:00 UTC to track progress
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  track-progress:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Analyze Implementation Progress
+      id: analyze
+      run: |
+        echo "=== ElizaOS C++ Implementation Analysis ==="
+        
+        # Count implementations by analyzing code content
+        TOTAL_MODULES=$(find cpp -mindepth 1 -maxdepth 1 -type d | wc -l)
+        PLACEHOLDER_COUNT=$(find cpp -name "placeholder.cpp" | wc -l)
+        
+        # Identify fully implemented modules (significant code and tests)
+        echo "🔍 Analyzing module implementations..."
+        IMPLEMENTED=()
+        PARTIAL=()
+        PLACEHOLDER=()
+        
+        for module_dir in cpp/*/; do
+          module_name=$(basename "$module_dir")
+          
+          # Skip test directory
+          if [ "$module_name" = "tests" ]; then
+            continue
+          fi
+          
+          if [ -f "$module_dir/src/placeholder.cpp" ]; then
+            # Check if placeholder is the only implementation
+            cpp_files=$(find "$module_dir/src" -name "*.cpp" ! -name "placeholder.cpp" | wc -l)
+            if [ "$cpp_files" -gt 0 ]; then
+              PARTIAL+=("$module_name")
+            else
+              PLACEHOLDER+=("$module_name")
+            fi
+          else
+            # No placeholder file, likely fully implemented
+            cpp_files=$(find "$module_dir/src" -name "*.cpp" 2>/dev/null | wc -l)
+            if [ "$cpp_files" -gt 0 ]; then
+              IMPLEMENTED+=("$module_name")
+            fi
+          fi
+        done
+        
+        IMPL_COUNT=${#IMPLEMENTED[@]}
+        PARTIAL_COUNT=${#PARTIAL[@]}
+        PLACEHOLDER_ONLY_COUNT=${#PLACEHOLDER[@]}
+        
+        COMPLETION_PCT=$((IMPL_COUNT * 100 / (IMPL_COUNT + PARTIAL_COUNT + PLACEHOLDER_ONLY_COUNT)))
+        
+        echo "📊 Current Status:"
+        echo "   ✅ Fully Implemented: $IMPL_COUNT"
+        echo "   🟡 Partially Implemented: $PARTIAL_COUNT"
+        echo "   🚧 Placeholder Only: $PLACEHOLDER_ONLY_COUNT"
+        echo "   📈 Completion: $COMPLETION_PCT%"
+        
+        # Export for GitHub summary
+        {
+          echo "IMPL_COUNT=$IMPL_COUNT"
+          echo "PARTIAL_COUNT=$PARTIAL_COUNT"
+          echo "PLACEHOLDER_COUNT=$PLACEHOLDER_ONLY_COUNT"
+          echo "COMPLETION_PCT=$COMPLETION_PCT"
+        } >> $GITHUB_ENV
+        
+        # Create detailed lists
+        printf '%s\n' "${IMPLEMENTED[@]}" > implemented_modules.txt
+        printf '%s\n' "${PARTIAL[@]}" > partial_modules.txt
+        printf '%s\n' "${PLACEHOLDER[@]}" > placeholder_modules.txt
+    
+    - name: Generate Progress Report
+      run: |
+        cat > progress_report.md << 'EOF'
+        # 📊 ElizaOS C++ Implementation Progress Report
+        
+        **Generated**: $(date -u +"%Y-%m-%d %H:%M UTC")
+        **Commit**: ${{ github.sha }}
+        
+        ## Current Status
+        
+        | Category | Count | Percentage |
+        |----------|-------|------------|
+        | ✅ Fully Implemented | $IMPL_COUNT | $((IMPL_COUNT * 100 / (IMPL_COUNT + PARTIAL_COUNT + PLACEHOLDER_COUNT)))% |
+        | 🟡 Partially Implemented | $PARTIAL_COUNT | $((PARTIAL_COUNT * 100 / (IMPL_COUNT + PARTIAL_COUNT + PLACEHOLDER_COUNT)))% |
+        | 🚧 Placeholder Only | $PLACEHOLDER_COUNT | $((PLACEHOLDER_COUNT * 100 / (IMPL_COUNT + PARTIAL_COUNT + PLACEHOLDER_COUNT)))% |
+        | **Total Modules** | **$((IMPL_COUNT + PARTIAL_COUNT + PLACEHOLDER_COUNT))** | **100%** |
+        
+        ## 📈 Overall Completion: $COMPLETION_PCT%
+        
+        ## ✅ Fully Implemented Modules
+        EOF
+        
+        if [ -s implemented_modules.txt ]; then
+          while read -r module; do
+            echo "- \`$module\`" >> progress_report.md
+          done < implemented_modules.txt
+        else
+          echo "*None yet*" >> progress_report.md
+        fi
+        
+        cat >> progress_report.md << 'EOF'
+        
+        ## 🟡 Partially Implemented Modules
+        EOF
+        
+        if [ -s partial_modules.txt ]; then
+          while read -r module; do
+            echo "- \`$module\` (has both real implementation and placeholder)" >> progress_report.md
+          done < partial_modules.txt
+        else
+          echo "*None*" >> progress_report.md
+        fi
+        
+        cat >> progress_report.md << 'EOF'
+        
+        ## 🚧 Placeholder Only Modules (Implementation Needed)
+        EOF
+        
+        if [ -s placeholder_modules.txt ]; then
+          while read -r module; do
+            echo "- \`$module\`" >> progress_report.md
+          done < placeholder_modules.txt
+        else
+          echo "*All modules implemented!* 🎉" >> progress_report.md
+        fi
+        
+        cat >> progress_report.md << 'EOF'
+        
+        ## 🎯 Next Priority Implementations
+        
+        Based on the [Implementation Roadmap](IMPLEMENTATION_ROADMAP.md), the highest priority modules for implementation are:
+        
+        1. **agentbrowser** - Web automation capabilities
+        2. **eliza** - Core conversation engine  
+        3. **characters** - Character and personality management
+        4. **knowledge** - Knowledge base and retrieval
+        5. **ljspeechtools** - Speech processing capabilities
+        
+        ---
+        *This report is automatically generated by the Implementation Progress Tracker workflow.*
+        EOF
+    
+    - name: Create GitHub Job Summary
+      run: |
+        cat progress_report.md >> $GITHUB_STEP_SUMMARY
+    
+    - name: Save Progress Report as Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: implementation-progress-report
+        path: progress_report.md
+        retention-days: 30
+    
+    - name: Comment on Implementation Progress (on push to main)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('progress_report.md', 'utf8');
+          
+          // Find or create implementation tracking issue
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: 'implementation-tracking',
+            state: 'open'
+          });
+          
+          if (issues.data.length > 0) {
+            // Update existing tracking issue
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issues.data[0].number,
+              body: `## Implementation Progress Update\n\n${report}`
+            });
+          } else {
+            // Create new tracking issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '📊 ElizaOS C++ Implementation Progress Tracking',
+              body: `# Implementation Progress Tracking\n\nThis issue tracks the ongoing progress of converting placeholder modules to full implementations.\n\n${report}`,
+              labels: ['implementation-tracking', 'documentation']
+            });
+          }

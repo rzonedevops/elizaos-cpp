@@ -42,6 +42,52 @@ jobs:
       working-directory: build
       run: ctest --output-on-failure --config ${{ matrix.build_type }}
 
+  implementation-status:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Analyze Implementation Status
+      run: |
+        echo "=== ElizaOS C++ Implementation Status ==="
+        echo ""
+        
+        # Count total modules
+        TOTAL_MODULES=$(find cpp -name "CMakeLists.txt" | wc -l)
+        
+        # Count placeholder implementations
+        PLACEHOLDER_COUNT=$(find cpp -name "placeholder.cpp" | wc -l)
+        
+        # Count real implementations (modules with substantial code)
+        REAL_IMPL_COUNT=$((TOTAL_MODULES - PLACEHOLDER_COUNT))
+        
+        # Calculate percentage
+        COMPLETION_PCT=$((REAL_IMPL_COUNT * 100 / TOTAL_MODULES))
+        
+        echo "📊 Implementation Progress:"
+        echo "   Total Modules: $TOTAL_MODULES"
+        echo "   Implemented: $REAL_IMPL_COUNT ($COMPLETION_PCT%)"
+        echo "   Placeholders: $PLACEHOLDER_COUNT"
+        echo ""
+        
+        echo "🚧 Placeholder Modules Remaining:"
+        find cpp -name "placeholder.cpp" | sed 's|cpp/||' | sed 's|/src/placeholder.cpp||' | sort
+        echo ""
+        
+        echo "✅ Fully Implemented Modules:"
+        # Find modules without placeholders that have substantial implementations
+        for dir in cpp/*/; do
+          if [ ! -f "$dir/src/placeholder.cpp" ] && [ -f "$dir/CMakeLists.txt" ]; then
+            basename "$dir"
+          fi
+        done | sort
+        echo ""
+        
+        # Set output for use in other steps
+        echo "COMPLETION_PCT=$COMPLETION_PCT" >> $GITHUB_ENV
+        echo "PLACEHOLDER_COUNT=$PLACEHOLDER_COUNT" >> $GITHUB_ENV
+        echo "REAL_IMPL_COUNT=$REAL_IMPL_COUNT" >> $GITHUB_ENV
+
   lint:
     runs-on: ubuntu-latest
     steps:

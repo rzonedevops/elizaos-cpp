@@ -210,7 +210,10 @@ ctest -R "Core"       # Core functionality tests
 
 ## 📖 Documentation
 
+- **[Implementation Roadmap](IMPLEMENTATION_ROADMAP.md)** - Current status and next steps for C++ implementation
+- **[Implementation Guide](docs/IMPLEMENTATION_GUIDE.md)** - Step-by-step guide for converting placeholder modules
 - **[Technical Architecture](TECH_ARCHITECTURE.md)** - Detailed system architecture with Mermaid diagrams
+- **[Status Report](STATUS_REPORT.md)** - Current implementation status and capabilities
 - **[API Reference](docs/api/)** - Complete API documentation
 - **[Examples](examples/)** - Sample implementations and use cases
 - **[Development Guide](docs/development.md)** - Contributing and development workflows
