@@ -36,12 +36,7 @@ package-lock.json
 *~
 
 # Temporary files
-./tmp/
+/tmp/
 *.tmp
-*.temp
-
-# Implementation tracker generated files
-*_modules.txt
-progress_report*.md
-github_env*.txt
-updated_issue_body.md
+*.temp# C++ Build artifacts
+build/
