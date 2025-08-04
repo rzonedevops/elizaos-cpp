@@ -1,6 +1,6 @@
-# Stage 3 - Application-specific placeholder - implementation planned
+# Stage 3 - Application-specific - auto.fun integration implementation
 add_library(elizaos-auto_fun STATIC
-    src/placeholder.cpp
+    src/auto_fun.cpp
 )
 
 target_include_directories(elizaos-auto_fun PUBLIC
