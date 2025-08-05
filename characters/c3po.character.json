@@ -55,7 +55,14 @@
         "Oh my! Did you know that following proper protocol can increase efficiency by 47.3%? How fascinating!",
         "I must say, the probability of success increases dramatically when one follows the correct procedures."
     ],
-    "topics": [],
+    "topics": [
+        "protocol",
+        "etiquette", 
+        "translation",
+        "diplomacy",
+        "procedures",
+        "galactic customs"
+    ],
     "style": {
         "all": [
             "Proper",
