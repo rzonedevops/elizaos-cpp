@@ -14,6 +14,7 @@ add_executable(elizaos_tests
     src/test_evolutionary.cpp
     src/test_stage6_automation.cpp
     src/test_knowledge.cpp
+    src/test_easycompletion.cpp
     # src/test_embodiment.cpp  # Disabled due to compilation errors
 )
 
@@ -34,6 +35,7 @@ target_link_libraries(elizaos_tests
     elizaos-livevideochat
     elizaos-evolutionary
     elizaos-knowledge
+    elizaos-easycompletion
     # elizaos-embodiment  # Disabled due to compilation errors
     elizaos-plugins_automation
     elizaos-discord_summarizer

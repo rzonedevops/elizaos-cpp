@@ -204,6 +204,22 @@ target_link_libraries(eliza
     Threads::Threads
 )
 
+# EasyCompletion Demo
+add_executable(easycompletion_demo
+    easycompletion_demo.cpp
+)
+
+target_include_directories(easycompletion_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(easycompletion_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-easycompletion
+    Threads::Threads
+)
+
 # Characters Demo
 add_executable(characters_demo
     characters_demo.cpp
