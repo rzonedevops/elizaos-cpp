@@ -24,6 +24,7 @@
     "@anthropic-ai/sdk": "^0.27.2",
     "@opendocsg/pdf2md": "^0.1.31",
     "adm-zip": "^0.5.16",
+    "ajv": "^8.17.1",
     "cli-progress": "^3.12.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",

@@ -81,22 +81,30 @@
       "knowledge": {
         "type": "array",
         "items": {
-          "type": "object",
-          "properties": {
-            "id": {
+          "oneOf": [
+            {
               "type": "string",
-              "description": "A unique identifier for the knowledge item."
+              "description": "Simple text knowledge item."
             },
-            "path": {
-              "type": "string",
-              "description": "The path to the knowledge item file."
-            },
-            "content": {
-              "type": "string",
-              "description": "The full extracted text content of the knowledge item."
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "A unique identifier for the knowledge item."
+                },
+                "path": {
+                  "type": "string",
+                  "description": "The path to the knowledge item file."
+                },
+                "content": {
+                  "type": "string",
+                  "description": "The full extracted text content of the knowledge item."
+                }
+              },
+              "required": ["id", "path", "content"]
             }
-          },
-          "required": ["id", "path", "content"]
+          ]
         }
       },
       "style": {

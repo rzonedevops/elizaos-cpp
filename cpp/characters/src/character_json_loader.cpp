@@ -144,7 +144,22 @@ std::optional<CharacterProfile> CharacterJsonLoader::loadFromJsonString(const st
         if (j.contains("knowledge") && j["knowledge"].is_array()) {
             for (const auto& knowledgeItem : j["knowledge"]) {
                 if (knowledgeItem.is_string()) {
+                    // Handle simple string format
                     character.background.additionalContext["knowledge"] += knowledgeItem.get<std::string>() + "; ";
+                } else if (knowledgeItem.is_object() && knowledgeItem.contains("content")) {
+                    // Handle object format with id, path, content
+                    std::string content = knowledgeItem["content"].get<std::string>();
+                    character.background.additionalContext["knowledge"] += content + "; ";
+                    
+                    // Store additional metadata if present
+                    if (knowledgeItem.contains("id")) {
+                        std::string id = knowledgeItem["id"].get<std::string>();
+                        character.background.additionalContext["knowledge_id_" + id] = content;
+                    }
+                    if (knowledgeItem.contains("path")) {
+                        std::string path = knowledgeItem["path"].get<std::string>();
+                        character.background.additionalContext["knowledge_source"] += path + "; ";
+                    }
                 }
             }
         }
