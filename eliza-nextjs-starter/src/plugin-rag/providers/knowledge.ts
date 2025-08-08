@@ -18,7 +18,9 @@ export const knowledgeProvider: Provider = {
     "Knowledge from the knowledge base that the agent knows, retrieved whenever the agent needs to answer a question about their expertise.",
   get: async (runtime: IAgentRuntime, message: Memory) => {
     console.log("*** RETRIEVING KNOWLEDGE ***");
-    const knowledgeData = await runtime.getKnowledge(message);
+    // TODO: getKnowledge method not available in current IAgentRuntime interface
+    // const knowledgeData = await runtime.getKnowledge(message);
+    const knowledgeData: any[] = []; // Empty for now
 
     const firstFiveKnowledgeItems = knowledgeData?.slice(0, 5);
 

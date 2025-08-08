@@ -655,7 +655,6 @@ export const Chat = ({ sessionId: propSessionId }: ChatProps = {}) => {
                 <Button
                   onClick={() => setShowSessionSwitcher(!showSessionSwitcher)}
                   plain
-                  color="blue"
                 >
                   {showSessionSwitcher ? "Hide Sessions" : "Switch Chat"}
                 </Button>

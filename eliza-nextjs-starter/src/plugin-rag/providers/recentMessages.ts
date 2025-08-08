@@ -191,7 +191,7 @@ export const recentMessagesProvider: Provider = {
           sender = runtime.character.name;
         } else {
           sender =
-            interactionEntityMap.get(message.entityId)?.metadata?.username ||
+            (interactionEntityMap.get(message.entityId)?.metadata as any)?.username ||
             "unknown";
         }
 
