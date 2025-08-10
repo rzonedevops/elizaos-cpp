@@ -271,7 +271,22 @@ target_link_libraries(knowledge_demo
     Threads::Threads
 )
 
-# Knowledge Quick Demo
+# Eliza's List Demo
+add_executable(elizas_list_demo
+    elizas_list_demo.cpp
+)
+
+target_include_directories(elizas_list_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(elizas_list_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-elizas_list
+    nlohmann_json::nlohmann_json
+    Threads::Threads
+)
 add_executable(knowledge_quick_demo
     knowledge_quick_demo.cpp
 )

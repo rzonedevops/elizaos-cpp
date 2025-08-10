@@ -1,6 +1,6 @@
-# Stage 3 - Application-specific placeholder - implementation planned
+# Stage 3 - Application-specific - Eliza's List project management
 add_library(elizaos-elizas_list STATIC
-    src/placeholder.cpp
+    src/elizas_list.cpp
 )
 
 target_include_directories(elizaos-elizas_list PUBLIC
@@ -9,4 +9,5 @@ target_include_directories(elizaos-elizas_list PUBLIC
 
 target_link_libraries(elizaos-elizas_list 
     elizaos-core
+    nlohmann_json::nlohmann_json
 )
