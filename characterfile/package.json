@@ -28,7 +28,7 @@
     "cli-progress": "^3.12.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
-    "inquirer": "^10.2.2",
+    "inquirer": "^12.9.1",
     "node-fetch": "^3.3.2",
     "node-llama-cpp": "^3.0.0-beta.44",
     "node-stream-zip": "^1.15.0",
