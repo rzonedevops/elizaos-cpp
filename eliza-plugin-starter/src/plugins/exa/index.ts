@@ -135,3 +135,7 @@ export class ExaSearchPlugin implements SearchPlugin {
     },
   ];
 }
+
+export default new ExaSearchPlugin({
+  apiKey: process.env.EXA_API_KEY || "",
+});
