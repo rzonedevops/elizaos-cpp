@@ -345,23 +345,26 @@ export const getChannelMessages = async (
     const AGENT_ID = process.env.NEXT_PUBLIC_AGENT_ID;
 
     // Transform channel messages to match the UI format exactly
-    return response.data.messages.map((msg) => {
-      // More accurate agent detection using agent ID
-      const isAgentMessage = msg.senderId === AGENT_ID || msg.authorId === AGENT_ID;
-      
-      return {
-        id: msg.id,
-        name: isAgentMessage ? "Agent" : "User",
-        text: msg.content || msg.text || "",
-        senderId: msg.senderId || msg.authorId || "",
-        roomId: channelId,
-        createdAt: new Date(msg.createdAt).getTime(),
-        source: msg.source || "API",
-        thought: msg.metadata?.thought,
-        actions: msg.metadata?.actions,
-        isLoading: false,
-      };
-    }).sort((a, b) => a.createdAt - b.createdAt); // Ensure chronological order
+    return response.data.messages
+      .map((msg) => {
+        // More accurate agent detection using agent ID
+        const isAgentMessage =
+          msg.senderId === AGENT_ID || msg.authorId === AGENT_ID;
+
+        return {
+          id: msg.id,
+          name: isAgentMessage ? "Agent" : "User",
+          text: msg.content || msg.text || "",
+          senderId: msg.senderId || msg.authorId || "",
+          roomId: channelId,
+          createdAt: new Date(msg.createdAt).getTime(),
+          source: msg.source || "API",
+          thought: msg.metadata?.thought,
+          actions: msg.metadata?.actions,
+          isLoading: false,
+        };
+      })
+      .sort((a, b) => a.createdAt - b.createdAt); // Ensure chronological order
   } catch (error) {
     console.error("[API Client] Error fetching channel messages:", error);
     return [];

@@ -14,7 +14,11 @@ import SocketIOManager, {
   MessageBroadcastData,
 } from "@/lib/socketio-manager";
 import type { ChatMessage } from "@/types/chat-message";
-import { getChannelMessages, getRoomMemories, pingServer } from "@/lib/api-client";
+import {
+  getChannelMessages,
+  getRoomMemories,
+  pingServer,
+} from "@/lib/api-client";
 
 // Simple spinner component
 const LoadingSpinner = () => (
@@ -464,17 +468,23 @@ export const Chat = ({ sessionId: propSessionId }: ChatProps = {}) => {
         // First try the channel messages API (matches new message format)
         const channelMessages = await getChannelMessages(channelId, 50);
         if (channelMessages.length > 0) {
-          console.log(`[Chat] Loaded ${channelMessages.length} channel messages`);
+          console.log(
+            `[Chat] Loaded ${channelMessages.length} channel messages`,
+          );
           return channelMessages;
         }
-        
+
         // Fallback to room memories if channel messages are empty
-        console.log('[Chat] No channel messages found, trying room memories...');
+        console.log(
+          "[Chat] No channel messages found, trying room memories...",
+        );
         const roomMessages = await getRoomMemories(agentId, channelId, 50);
-        console.log(`[Chat] Loaded ${roomMessages.length} room memory messages`);
+        console.log(
+          `[Chat] Loaded ${roomMessages.length} room memory messages`,
+        );
         return roomMessages;
       } catch (error) {
-        console.error('[Chat] Error loading message history:', error);
+        console.error("[Chat] Error loading message history:", error);
         return [];
       }
     };
@@ -645,17 +655,13 @@ export const Chat = ({ sessionId: propSessionId }: ChatProps = {}) => {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={() => createNewSession()}
-                color="blue"
-              >
+              <Button onClick={() => createNewSession()} color="blue">
                 New Chat
               </Button>
               {sessionData && (
                 <Button
                   onClick={() => setShowSessionSwitcher(!showSessionSwitcher)}
                   plain
-                  color="blue"
                 >
                   {showSessionSwitcher ? "Hide Sessions" : "Switch Chat"}
                 </Button>

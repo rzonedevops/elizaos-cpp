@@ -51,10 +51,7 @@ export async function POST(request: NextRequest) {
           // Look for existing channel with this EXACT session ID only
           const existingChannel = allChannels.find((channel: any) => {
             const metadata = channel.metadata || {};
-            return (
-              channel.id === sessionId ||
-              metadata.sessionId === sessionId
-            );
+            return channel.id === sessionId || metadata.sessionId === sessionId;
           });
 
           if (existingChannel) {

@@ -55,10 +55,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Find the channel with matching sessionId ONLY
     const sessionChannel = channels.find((channel: any) => {
       const metadata = channel.metadata || {};
-      return (
-        channel.id === sessionId ||
-        metadata.sessionId === sessionId
-      );
+      return channel.id === sessionId || metadata.sessionId === sessionId;
     });
 
     if (!sessionChannel) {
