@@ -18,19 +18,9 @@ export default {
   // Repositories to track
   repositories: [
     {
-      owner: "elizaos",
-      name: "eliza",
+      owner: "ZoneCog",
+      name: "elizaos-cpp",
       defaultBranch: "main",
-    },
-    {
-      owner: "elizaos-plugins",
-      name: "plugin-solana",
-      defaultBranch: "1.x",
-    },
-    {
-      owner: "elizaos",
-      name: "auto.fun",
-      defaultBranch: "develop",
     },
   ],
   walletAddresses: {

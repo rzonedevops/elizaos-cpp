@@ -19,7 +19,7 @@ import fs from "fs/promises";
 import { getRepoFilePath } from "@/lib/fsHelpers";
 
 export async function getLatestAvailableDate() {
-  const date = await db
+  const result = await db
     .select({
       max: rawPullRequests.updatedAt,
     })
@@ -27,7 +27,12 @@ export async function getLatestAvailableDate() {
     .orderBy(desc(rawPullRequests.updatedAt))
     .limit(1);
 
-  return toDateString(date[0].max);
+  // If no pull requests exist, use today's date
+  if (!result || result.length === 0 || !result[0] || !result[0].max) {
+    return toDateString(new Date().toISOString());
+  }
+
+  return toDateString(result[0].max);
 }
 
 /**

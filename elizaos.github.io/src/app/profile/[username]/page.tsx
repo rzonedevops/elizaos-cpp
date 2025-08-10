@@ -9,21 +9,37 @@ type ProfilePageProps = {
 };
 
 export async function generateStaticParams() {
+  console.log("Generating static params for profile pages...");
+  
   const maxUsers = process.env.CI_MAX_USERS
     ? parseInt(process.env.CI_MAX_USERS, 10)
     : undefined;
 
-  // Get all users directly from the database
-  const allUsers = await db.query.users.findMany({
-    columns: {
-      username: true,
-    },
-    limit: maxUsers,
-  });
+  try {
+    // For now, return empty array to avoid build issues with empty database
+    // In production, this would query actual users
+    if (maxUsers === 0) {
+      console.log("CI_MAX_USERS is 0, returning empty params");
+      return [];
+    }
+    
+    // Get all users directly from the database
+    const allUsers = await db.query.users.findMany({
+      columns: {
+        username: true,
+      },
+      limit: maxUsers,
+    });
 
-  return allUsers.map((user) => ({
-    username: user.username,
-  }));
+    console.log(`Found ${allUsers.length} users for static params`);
+    
+    return allUsers.map((user) => ({
+      username: user.username,
+    }));
+  } catch (error) {
+    console.warn("Failed to fetch users for static params:", error);
+    return [];
+  }
 }
 
 export async function generateMetadata({
