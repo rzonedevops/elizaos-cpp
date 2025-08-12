@@ -1,6 +1,6 @@
-# Stage 3 - Application-specific placeholder - implementation planned
+# Stage 3 - HATs protocol for multiple data sources
 add_library(elizaos-hats STATIC
-    src/placeholder.cpp
+    src/hats.cpp
 )
 
 target_include_directories(elizaos-hats PUBLIC
@@ -10,3 +10,15 @@ target_include_directories(elizaos-hats PUBLIC
 target_link_libraries(elizaos-hats 
     elizaos-core
 )
+
+# Add test executable
+if(BUILD_TESTING)
+    add_executable(test_hats test/test_hats.cpp)
+    target_link_libraries(test_hats
+        elizaos-hats
+        elizaos-core
+        gtest
+        gtest_main
+    )
+    add_test(NAME HatsTest COMMAND test_hats)
+endif()
