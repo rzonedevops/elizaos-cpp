@@ -388,6 +388,22 @@ target_link_libraries(elizas_world_test
     Threads::Threads
 )
 
+# Registry Demo
+add_executable(registry_demo
+    registry_demo.cpp
+)
+
+target_include_directories(registry_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(registry_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-registry
+    Threads::Threads
+)
+
 # Add example executable (optional)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)

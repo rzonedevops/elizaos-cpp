@@ -16,6 +16,7 @@ add_executable(elizaos_tests
     src/test_knowledge.cpp
     src/test_easycompletion.cpp
     src/test_elizas_world.cpp
+    src/test_registry.cpp
     test_awesome_eliza.cpp
     # src/test_embodiment.cpp  # Disabled due to compilation errors
     ../autofun_idl/tests/test_autofun_idl.cpp
@@ -48,6 +49,7 @@ target_link_libraries(elizaos_tests
     elizaos-discord_summarizer
     elizaos-discrub_ext
     elizaos-autofun_idl
+    elizaos-registry
     gtest_main
     gmock_main
     Threads::Threads
