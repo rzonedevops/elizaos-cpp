@@ -64,8 +64,43 @@ export * from './messages.ts';
 export * from './posts.ts';
 export * from './runtime.ts';
 
-// TODO: Implement the remaining adapters:
-// - action/handler
-// - database
-// - knowledge / memory
-// - relationships
+// Action/Handler adapters
+export { fromV2Action, toV2Action, Action, Handler, Validator } from './action.ts';
+
+// Database adapters
+export { fromV2DatabaseAdapter, toV2DatabaseAdapter, IDatabaseAdapter } from './database.ts';
+
+// Knowledge/Memory adapters
+export {
+  knowledgeItemToMemory,
+  memoryToKnowledgeItem,
+  ragKnowledgeToMemory,
+  memoryToRagKnowledge,
+  knowledgeItemsToMemories,
+  memoriesToKnowledgeItems,
+  ragKnowledgeItemsToMemories,
+  memoriesToRagKnowledgeItems,
+  adaptKnowledgeSearchParams,
+  filterKnowledgeByScope,
+  createKnowledgeMetadata,
+  isSharedKnowledge,
+  KNOWLEDGE_TABLE_NAMES,
+} from './knowledge.ts';
+
+// Relationship adapters
+export {
+  fromV2Relationship,
+  toV2Relationship,
+  fromV2Relationships,
+  toV2Relationships,
+  fromV2RelationshipEnhanced,
+  toV2RelationshipEnhanced,
+  createV1Relationship,
+  areRelationshipsEquivalent,
+  filterRelationshipsByStatus,
+  getRelationshipsForUser,
+  tagsToStatus,
+  statusToTags,
+  RELATIONSHIP_STATUSES,
+  Relationship,
+} from './relationship.ts';
