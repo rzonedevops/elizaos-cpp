@@ -126,6 +126,37 @@ add_subdirectory(cpp/plugins_automation)        # Plugin automation
 # Testing
 add_subdirectory(cpp/tests)
 
+# Spartan Test
+add_executable(spartan_test
+    spartan_test.cpp
+)
+
+target_include_directories(spartan_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(spartan_test
+    elizaos-core
+    elizaos-spartan
+    Threads::Threads
+)
+
+# Spartan Demo
+add_executable(spartan_demo
+    spartan_demo.cpp
+)
+
+target_include_directories(spartan_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(spartan_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-spartan
+    Threads::Threads
+)
+
 # Stage 4 Demo
 add_executable(stage4_demo
     demo_stage4.cpp

@@ -16,6 +16,7 @@ add_executable(elizaos_tests
     src/test_knowledge.cpp
     src/test_easycompletion.cpp
     src/test_elizas_world.cpp
+    src/test_spartan.cpp
     test_awesome_eliza.cpp
     # src/test_embodiment.cpp  # Disabled due to compilation errors
     ../autofun_idl/tests/test_autofun_idl.cpp
@@ -43,6 +44,7 @@ target_link_libraries(elizaos_tests
     elizaos-elizas_world
     elizaos-awesome_eliza
     elizaos-eliza_3d_hyperfy_starter
+    elizaos-spartan
     # elizaos-embodiment  # Disabled due to compilation errors
     elizaos-plugins_automation
     elizaos-discord_summarizer

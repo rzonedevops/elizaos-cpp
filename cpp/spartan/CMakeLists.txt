@@ -1,6 +1,6 @@
-# Stage 3 - Application-specific placeholder - implementation planned
+# Stage 3 - Spartan DeFi Trading Agent
 add_library(elizaos-spartan STATIC
-    src/placeholder.cpp
+    src/spartan.cpp
 )
 
 target_include_directories(elizaos-spartan PUBLIC
