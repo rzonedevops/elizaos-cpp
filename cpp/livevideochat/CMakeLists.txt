@@ -1,6 +1,7 @@
-# Stage 4 - Multimedia placeholder - implementation planned
+# Stage 4 - Multimedia - LiveVideoChat implementation with server support
 add_library(elizaos-livevideochat STATIC
     src/placeholder.cpp
+    src/livevideochat_server.cpp
 )
 
 target_include_directories(elizaos-livevideochat PUBLIC
@@ -9,4 +10,6 @@ target_include_directories(elizaos-livevideochat PUBLIC
 
 target_link_libraries(elizaos-livevideochat 
     elizaos-core
+    elizaos-agentlogger
+    Threads::Threads
 )
