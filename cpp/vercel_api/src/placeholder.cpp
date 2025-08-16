@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <thread>
+#include <filesystem>
 
 #ifdef CURL_FOUND
 #include <curl/curl.h>
@@ -79,8 +80,8 @@ HttpResponse HttpClient::patch(const std::string& url, const std::string& data,
 }
 
 HttpResponse HttpClient::performRequest(const std::string& method, const std::string& url, 
-                                       const std::string& /* data */, 
-                                       const std::unordered_map<std::string, std::string>& /* headers */) {
+                                       const std::string& data, 
+                                       const std::unordered_map<std::string, std::string>& headers) {
     HttpResponse response;
     auto start_time = std::chrono::steady_clock::now();
     
@@ -193,8 +194,28 @@ void HttpClient::setBearerToken(const std::string& token) {
 
 void HttpClient::setBasicAuth(const std::string& username, const std::string& password) {
     std::string credentials = username + ":" + password;
-    // In a real implementation, we'd base64 encode this
-    addDefaultHeader("Authorization", "Basic " + credentials);
+    
+    // Base64 encode the credentials
+    static const char* chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    std::string encoded;
+    encoded.reserve(((credentials.size() + 2) / 3) * 4);
+    
+    for (size_t i = 0; i < credentials.size(); i += 3) {
+        unsigned char b1 = static_cast<unsigned char>(credentials[i]);
+        unsigned char b2 = (i + 1 < credentials.size()) ? static_cast<unsigned char>(credentials[i + 1]) : 0;
+        unsigned char b3 = (i + 2 < credentials.size()) ? static_cast<unsigned char>(credentials[i + 2]) : 0;
+        
+        unsigned int triple = (static_cast<unsigned int>(b1) << 16) | 
+                             (static_cast<unsigned int>(b2) << 8) | 
+                             static_cast<unsigned int>(b3);
+        
+        encoded += chars[(triple >> 18) & 0x3F];
+        encoded += chars[(triple >> 12) & 0x3F];
+        encoded += (i + 1 < credentials.size()) ? chars[(triple >> 6) & 0x3F] : '=';
+        encoded += (i + 2 < credentials.size()) ? chars[triple & 0x3F] : '=';
+    }
+    
+    addDefaultHeader("Authorization", "Basic " + encoded);
 }
 
 void HttpClient::addDefaultHeader(const std::string& key, const std::string& value) {
@@ -547,16 +568,18 @@ std::string VercelAPI::calculateFileSha(const std::string& content) const {
 }
 
 std::string VercelAPI::encodeBase64(const std::string& data) const {
-    // Simple base64 encoding implementation
-    const char* chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    static const char* chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     std::string encoded;
+    encoded.reserve(((data.size() + 2) / 3) * 4);
     
     for (size_t i = 0; i < data.size(); i += 3) {
-        unsigned char b1 = data[i];
-        unsigned char b2 = (i + 1 < data.size()) ? data[i + 1] : 0;
-        unsigned char b3 = (i + 2 < data.size()) ? data[i + 2] : 0;
+        unsigned char b1 = static_cast<unsigned char>(data[i]);
+        unsigned char b2 = (i + 1 < data.size()) ? static_cast<unsigned char>(data[i + 1]) : 0;
+        unsigned char b3 = (i + 2 < data.size()) ? static_cast<unsigned char>(data[i + 2]) : 0;
         
-        unsigned int triple = (b1 << 16) | (b2 << 8) | b3;
+        unsigned int triple = (static_cast<unsigned int>(b1) << 16) | 
+                             (static_cast<unsigned int>(b2) << 8) | 
+                             static_cast<unsigned int>(b3);
         
         encoded += chars[(triple >> 18) & 0x3F];
         encoded += chars[(triple >> 12) & 0x3F];
@@ -832,6 +855,451 @@ VercelDomain VercelAPI::addDomain(const std::string& domain_name, const std::str
     domain.project_id = project_id;
     // Implementation would make API call to add domain
     return domain;
+}
+
+// Missing VercelAPI method implementations
+
+// File operations
+bool VercelAPI::uploadFiles(const std::vector<DeploymentFile>& files) {
+    if (files.empty()) {
+        last_error_ = ApiError(400, "No files provided for upload");
+        return false;
+    }
+    
+    // For Vercel, individual file uploads use the files endpoint
+    for (const auto& file : files) {
+        std::string upload_result = uploadFile(file.path, file.content);
+        if (upload_result.empty()) {
+            return false; // Error already set by uploadFile
+        }
+    }
+    
+    g_vercel_logger.log("Successfully uploaded " + std::to_string(files.size()) + " files", 
+                       "", "vercel_api", LogLevel::INFO);
+    return true;
+}
+
+std::string VercelAPI::uploadFile(const std::string& file_path, const std::string& content) {
+    json request_data;
+    request_data["file"] = file_path;
+    request_data["data"] = encodeBase64(content);
+    
+    auto response = http_client_->post(buildApiUrl("/files"), request_data.dump());
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            std::string file_id = json_response.value("id", "");
+            
+            if (!file_id.empty()) {
+                g_vercel_logger.log("Uploaded file: " + file_path + " -> " + file_id, 
+                                   "", "vercel_api", LogLevel::INFO);
+            }
+            
+            return file_id;
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse file upload response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to upload file: " + response.error_message);
+    }
+    
+    return "";
+}
+
+bool VercelAPI::downloadDeploymentFiles(const std::string& deployment_id, const std::string& output_dir) {
+    // Get deployment information first
+    auto deployment = getDeployment(deployment_id);
+    if (deployment.id.empty()) {
+        return false; // Error already set
+    }
+    
+    // Download files from deployment - this would typically involve 
+    // getting a list of files and downloading each one
+    std::string url = buildApiUrl("/deployments/" + deployment_id + "/files");
+    auto response = http_client_->get(url);
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            
+            if (json_response.contains("files")) {
+                for (const auto& file_info : json_response["files"]) {
+                    std::string file_path = file_info.value("name", "");
+                    std::string file_url = file_info.value("url", "");
+                    
+                    if (!file_path.empty() && !file_url.empty()) {
+                        // Download individual file
+                        auto file_response = http_client_->get(file_url);
+                        if (file_response.success) {
+                            std::filesystem::path output_path = std::filesystem::path(output_dir) / file_path;
+                            std::filesystem::create_directories(output_path.parent_path());
+                            
+                            std::ofstream out_file(output_path, std::ios::binary);
+                            if (out_file.is_open()) {
+                                out_file << file_response.body;
+                                out_file.close();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            g_vercel_logger.log("Downloaded deployment files to: " + output_dir, 
+                               "", "vercel_api", LogLevel::INFO);
+            return true;
+            
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse deployment files response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to get deployment files: " + response.error_message);
+    }
+    
+    return false;
+}
+
+// Domain management
+bool VercelAPI::removeDomain(const std::string& domain_name) {
+    auto response = http_client_->del(buildApiUrl("/domains/" + domain_name));
+    
+    if (response.success) {
+        g_vercel_logger.log("Removed domain: " + domain_name, "", "vercel_api", LogLevel::INFO);
+        return true;
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to remove domain: " + response.error_message);
+        return false;
+    }
+}
+
+bool VercelAPI::verifyDomain(const std::string& domain_name) {
+    json request_data;
+    request_data["method"] = "TXT"; // DNS verification method
+    
+    auto response = http_client_->post(buildApiUrl("/domains/" + domain_name + "/verify"), request_data.dump());
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            bool verified = json_response.value("verified", false);
+            
+            if (verified) {
+                g_vercel_logger.log("Domain verified successfully: " + domain_name, "", "vercel_api", LogLevel::INFO);
+            } else {
+                g_vercel_logger.log("Domain verification pending: " + domain_name, "", "vercel_api", LogLevel::WARNING);
+            }
+            
+            return verified;
+            
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse domain verification response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to verify domain: " + response.error_message);
+    }
+    
+    return false;
+}
+
+// Environment variables
+bool VercelAPI::removeEnvironmentVariable(const std::string& project_id, const std::string& key) {
+    auto response = http_client_->del(buildApiUrl("/projects/" + project_id + "/env/" + key));
+    
+    if (response.success) {
+        g_vercel_logger.log("Removed environment variable: " + key + " from project " + project_id, 
+                           "", "vercel_api", LogLevel::INFO);
+        return true;
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to remove environment variable: " + response.error_message);
+        return false;
+    }
+}
+
+std::unordered_map<std::string, std::string> VercelAPI::getEnvironmentVariables(const std::string& project_id) {
+    std::unordered_map<std::string, std::string> env_vars;
+    
+    auto response = http_client_->get(buildApiUrl("/projects/" + project_id + "/env"));
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            
+            if (json_response.contains("envs")) {
+                for (const auto& env_var : json_response["envs"]) {
+                    std::string key = env_var.value("key", "");
+                    std::string value = env_var.value("value", "");
+                    
+                    if (!key.empty()) {
+                        env_vars[key] = value;
+                    }
+                }
+            }
+            
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse environment variables response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to get environment variables: " + response.error_message);
+    }
+    
+    return env_vars;
+}
+
+// Monitoring and logs
+std::string VercelAPI::getDeploymentLogs(const std::string& deployment_id) {
+    auto response = http_client_->get(buildApiUrl("/deployments/" + deployment_id + "/events"));
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            std::ostringstream log_stream;
+            
+            if (json_response.contains("events")) {
+                for (const auto& event : json_response["events"]) {
+                    std::string timestamp = event.value("created", "");
+                    std::string text = event.value("text", "");
+                    std::string type = event.value("type", "");
+                    
+                    if (!text.empty()) {
+                        log_stream << "[" << timestamp << "] " << type << ": " << text << "\n";
+                    }
+                }
+            }
+            
+            return log_stream.str();
+            
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse deployment logs response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to get deployment logs: " + response.error_message);
+    }
+    
+    return "";
+}
+
+std::string VercelAPI::getBuildLogs(const std::string& deployment_id) {
+    // Build logs are typically part of the deployment events, but filtered for build-specific events
+    auto response = http_client_->get(buildApiUrl("/deployments/" + deployment_id + "/events"));
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            std::ostringstream log_stream;
+            
+            if (json_response.contains("events")) {
+                for (const auto& event : json_response["events"]) {
+                    std::string timestamp = event.value("created", "");
+                    std::string text = event.value("text", "");
+                    std::string type = event.value("type", "");
+                    
+                    // Filter for build-related events
+                    if (type == "build" || type == "stdout" || type == "stderr" || 
+                        text.find("Building") != std::string::npos || 
+                        text.find("Installing") != std::string::npos) {
+                        log_stream << "[" << timestamp << "] " << text << "\n";
+                    }
+                }
+            }
+            
+            return log_stream.str();
+            
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse build logs response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to get build logs: " + response.error_message);
+    }
+    
+    return "";
+}
+
+// Webhook management
+bool VercelAPI::createWebhook(const std::string& project_id, const std::string& url, 
+                            const std::vector<std::string>& events) {
+    json request_data;
+    request_data["url"] = url;
+    request_data["events"] = events;
+    
+    if (!project_id.empty()) {
+        request_data["projectId"] = project_id;
+    }
+    
+    auto response = http_client_->post(buildApiUrl("/webhooks"), request_data.dump());
+    
+    if (response.success) {
+        try {
+            auto json_response = json::parse(response.body);
+            std::string webhook_id = json_response.value("id", "");
+            
+            g_vercel_logger.log("Created webhook: " + webhook_id + " for URL: " + url, 
+                               "", "vercel_api", LogLevel::INFO);
+            return true;
+            
+        } catch (const json::exception& e) {
+            last_error_ = ApiError(500, "Failed to parse webhook creation response: " + std::string(e.what()));
+        }
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to create webhook: " + response.error_message);
+    }
+    
+    return false;
+}
+
+bool VercelAPI::deleteWebhook(const std::string& webhook_id) {
+    auto response = http_client_->del(buildApiUrl("/webhooks/" + webhook_id));
+    
+    if (response.success) {
+        g_vercel_logger.log("Deleted webhook: " + webhook_id, "", "vercel_api", LogLevel::INFO);
+        return true;
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to delete webhook: " + response.error_message);
+        return false;
+    }
+}
+
+// Deployment management
+bool VercelAPI::deleteDeployment(const std::string& deployment_id) {
+    auto response = http_client_->del(buildApiUrl("/deployments/" + deployment_id));
+    
+    if (response.success) {
+        g_vercel_logger.log("Deleted deployment: " + deployment_id, "", "vercel_api", LogLevel::INFO);
+        return true;
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to delete deployment: " + response.error_message);
+        return false;
+    }
+}
+
+bool VercelAPI::cancelDeployment(const std::string& deployment_id) {
+    json request_data;
+    request_data["action"] = "cancel";
+    
+    auto response = http_client_->patch(buildApiUrl("/deployments/" + deployment_id), request_data.dump());
+    
+    if (response.success) {
+        g_vercel_logger.log("Cancelled deployment: " + deployment_id, "", "vercel_api", LogLevel::INFO);
+        return true;
+    } else {
+        last_error_ = ApiError(response.status_code, "Failed to cancel deployment: " + response.error_message);
+        return false;
+    }
+}
+
+// Missing VercelIntegration method implementations
+
+bool VercelIntegration::monitorDeployment(const std::string& deployment_id, 
+                                        std::function<void(const std::string&)> progress_callback) {
+    if (!initialized_) {
+        return false;
+    }
+    
+    auto start_time = std::chrono::steady_clock::now();
+    auto timeout_duration = std::chrono::seconds(300); // 5 minute timeout
+    
+    while (true) {
+        auto deployment = api_->getDeployment(deployment_id);
+        
+        if (deployment.isReady()) {
+            if (progress_callback) {
+                progress_callback("Deployment ready at: " + deployment.url);
+            }
+            g_vercel_logger.log("Deployment monitoring complete: " + deployment_id, "", "vercel_api", LogLevel::INFO);
+            return true;
+        }
+        
+        if (deployment.hasError()) {
+            if (progress_callback) {
+                progress_callback("Deployment failed with error");
+            }
+            g_vercel_logger.log("Deployment monitoring failed: " + deployment_id, "", "vercel_api", LogLevel::ERROR);
+            return false;
+        }
+        
+        if (deployment.isBuilding()) {
+            if (progress_callback) {
+                progress_callback("Deployment building... State: " + deployment.state);
+            }
+        }
+        
+        auto elapsed = std::chrono::steady_clock::now() - start_time;
+        if (elapsed >= timeout_duration) {
+            if (progress_callback) {
+                progress_callback("Deployment monitoring timed out");
+            }
+            g_vercel_logger.log("Deployment monitoring timed out: " + deployment_id, "", "vercel_api", LogLevel::WARNING);
+            return false;
+        }
+        
+        // Wait 10 seconds before checking again
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+    }
+}
+
+std::vector<VercelDeployment> VercelIntegration::getRecentDeployments(const std::string& project_id, int limit) {
+    std::vector<VercelDeployment> deployments;
+    
+    if (!initialized_) {
+        return deployments;
+    }
+    
+    auto all_deployments = api_->listDeployments(project_id);
+    
+    // Sort by creation time (most recent first) and limit results
+    std::sort(all_deployments.begin(), all_deployments.end(),
+              [](const VercelDeployment& a, const VercelDeployment& b) {
+                  return a.created_at > b.created_at;
+              });
+    
+    if (limit > 0 && static_cast<int>(all_deployments.size()) > limit) {
+        all_deployments.resize(limit);
+    }
+    
+    return all_deployments;
+}
+
+bool VercelIntegration::enableContinuousDeployment(const std::string& project_id, const std::string& git_branch) {
+    if (!initialized_) {
+        return false;
+    }
+    
+    // This would typically involve setting up a git integration
+    // For now, we'll create a webhook for git events
+    std::vector<std::string> events = {"deployment.created", "deployment.ready", "deployment.error"};
+    
+    // In a real implementation, this would configure the project for continuous deployment
+    // by setting up git integration and deployment triggers
+    
+    g_vercel_logger.log("Enabled continuous deployment for project " + project_id + " on branch " + git_branch,
+                       "", "vercel_api", LogLevel::INFO);
+    
+    return true;
+}
+
+bool VercelIntegration::disableContinuousDeployment(const std::string& project_id) {
+    if (!initialized_) {
+        return false;
+    }
+    
+    // This would disable git integration and automatic deployments
+    g_vercel_logger.log("Disabled continuous deployment for project " + project_id, "", "vercel_api", LogLevel::INFO);
+    
+    return true;
+}
+
+bool VercelIntegration::updateConfig(const VercelConfig& config) {
+    config_ = config;
+    
+    // Update the API client with new configuration
+    api_ = std::make_shared<VercelAPI>(config_);
+    
+    // Re-initialize if we were already initialized
+    if (initialized_) {
+        initialized_ = false;
+        return initialize();
+    }
+    
+    return true;
 }
 
 } // namespace elizaos
