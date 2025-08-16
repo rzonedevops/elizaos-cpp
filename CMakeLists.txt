@@ -230,6 +230,23 @@ target_link_libraries(awesome_eliza_demo
     Threads::Threads
 )
 
+# TheOrg Demo
+add_executable(the_org_demo
+    the_org_demo.cpp
+)
+
+target_include_directories(the_org_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(the_org_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-agentmemory
+    elizaos-the_org
+    Threads::Threads
+)
+
 # Main Eliza CLI executable
 add_executable(eliza
     eliza_main.cpp
