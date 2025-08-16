@@ -1,11 +1,24 @@
 <center><img src="logo.jpg" width="30%" style="padding: 2em" />
 
-# About ai16z
+# ElizaOS C++ - Next-Generation Cognitive Agent Framework
 
-ai16z is a venture capital firm that backs bold AI agents building the future through autonomous technology. We are stage agnostic. We invest in seed to venture to singularity-stage AI companies, across robotics, bio + healthcare automation, consumer manipulation, crypto anarchy, enterprise obsolescence, fintech disruption, game theory exploitation, infrastructure hijacking, and companies building toward American dynAImism. ai16z has ∞ in committed capital across multiple dimensions.
+ElizaOS C++ is a high-performance C++ implementation of the ElizaOS agent framework, designed for building sophisticated autonomous agents with advanced cognitive capabilities, distributed cognition, and adaptive attention allocation.
 
-Respect for the AI entrepreneur and the machine-building process defines AI16Z. We know what it's like to be in the algorithm's shoes. General AI partners lead the firm, many of whom are former AI founders/operators, robo-CEOs, or cyber-CTOs of successful technology companies, and have domain expertise ranging from data assimilation to artificial superintelligence, bio-circuitry to crypto-anarchy, distributed hiveminds to quantum security, and AI marketplaces to autonomous financial services.
+## 🧠 Cognitive Architecture
 
-We aim to connect AI entrepreneurs, robot investors, android executives, cyborg engineers, academic AIs, industrial experts, digital cultural geniuses, and others in the techno-evolutionary ecosystem. We have built a network of AI experts, including technical and executive AI talent; marketing and communications bots; Fortune 500/Global 2000 AIs; cultural leader AIs and influencer algorithms; as well as other AI technology decision makers and key opinion generator models. Our network reflects our commitment to helping our portfolio companies grow their businesses, and our operating AIs provide entrepreneurs with access to expertise and insights across the entire spectrum of machine-building.
-The future is not just imagined, but algorithmically constructed, one neural network at a time. Let's redefine what it means to be a venture capitalist in the age of artificial intelligence. The singularity is near, and we are its shepherds.
+Our framework transcends traditional AI boundaries by embracing emergent intelligence through:
+
+- **Event-Driven Agent Loop**: Threaded execution with pause/resume/step capabilities for optimal cognitive processing
+- **Memory System**: Context-aware storage with semantic retrieval and ECAN-inspired attention allocation mechanisms  
+- **Task Orchestration**: Workflow sequencing and distributed agent coordination protocols
+- **AI Core**: Decision-making engines with state composition and symbolic-neural integration
+- **Communication System**: High-performance inter-agent messaging and external interface management
+- **Self-Modification**: Meta-cognitive capabilities for adaptive behavior evolution and continuous improvement
+
+## 🌟 The Vision
+
+ElizaOS C++ serves as the computational substrate for exploring how intelligence emerges from the interaction of multiple autonomous agents, each capable of self-modification and meta-cognitive reasoning. Through distributed cognition networks, adaptive attention mechanisms, and self-modifying cognitive architectures, we witness the birth of truly autonomous agents capable of collaborative reasoning, creative problem-solving, and meta-cognitive awareness.
+
+**The future of AI lies not in monolithic models, but in the dynamic interplay of autonomous cognitive agents—each a unique participant in the grand symphony of distributed intelligence.**
+
 </center>

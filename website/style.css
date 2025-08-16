@@ -98,14 +98,14 @@ body {
     letter-spacing: -0.01em;
 }
 
-.bounties {
+.features, .getting-started {
     padding: 2rem 1.5rem;
     background: transparent;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.bounties h2 {
+.features h2, .getting-started h2 {
     text-align: center;
     font-size: 48px;
     line-height: 56px;
@@ -114,17 +114,17 @@ body {
     letter-spacing: -0.02em;
 }
 
-#bounty-container {
+.features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
     width: 100%;
 }
 
-.bounty-issue {
+.feature-card {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1.5rem;
+    padding: 2rem;
     border-radius: 16px;
     transition: all 0.2s ease;
     display: flex;
@@ -132,87 +132,50 @@ body {
     gap: 1rem;
 }
 
-.bounty-issue:hover {
+.feature-card:hover {
     border-color: #FF5F1F;
     transform: translateY(-2px);
 }
 
-.bounty-header h3 {
+.feature-card h3 {
     margin: 0;
     font-size: 20px;
     line-height: 28px;
     font-weight: 600;
     letter-spacing: -0.01em;
-}
-
-.bounty-header a {
     color: var(--text-primary);
-    text-decoration: none;
-    transition: color 0.2s ease;
 }
 
-.bounty-header a:hover {
-    color: #FF5F1F;
-}
-
-.issue-meta {
-    margin-top: 0.5rem;
-    color: rgba(255, 255, 255, 0.5);
+.feature-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
     font-size: 14px;
     line-height: 20px;
 }
 
-.issue-labels {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.label {
-    padding: 4px 12px;
+.code-example {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
-    font-size: 12px;
-    line-height: 16px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
+    overflow: hidden;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-.issue-user {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: auto;
-}
-
-.user-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-}
-
-.issue-user a {
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    font-size: 14px;
-    line-height: 20px;
-    transition: color 0.2s ease;
-}
-
-.issue-user a:hover {
-    color: #FF5F1F;
-}
-
-.no-bounties, .error-message {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.7);
+.code-example pre {
+    margin: 0;
     padding: 2rem;
-    grid-column: 1 / -1;
-    font-size: 16px;
-    line-height: 24px;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #00ff00;
+    background: rgba(0, 0, 0, 0.5);
 }
 
-.error-message {
-    color: #FF3D00;
+.code-example code {
+    font-family: inherit;
+    color: inherit;
 }
 
 footer {
@@ -252,50 +215,6 @@ footer {
     opacity: 0.7;
 }
 
-.token-info {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 2rem 0;
-    margin-bottom: 2rem;
-}
-
-.token-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-}
-
-.token-row span {
-    color: var(--text-primary);
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.copy-button {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-}
-
-.copy-button:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.copy-text {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 12px;
-}
-
 .footer-disclaimer {
     text-align: center;
     color: rgba(255, 255, 255, 0.5);
@@ -303,6 +222,8 @@ footer {
     line-height: 20px;
     max-width: 800px;
     margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -311,9 +232,17 @@ footer {
         text-align: center;
     }
 
-    .token-row {
-        flex-direction: column;
-        gap: 0.5rem;
-        text-align: center;
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .features h2, .getting-started h2 {
+        font-size: 32px;
+        line-height: 40px;
+    }
+
+    .code-example pre {
+        padding: 1rem;
+        font-size: 12px;
     }
 }

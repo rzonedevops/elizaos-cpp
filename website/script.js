@@ -1,11 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('matrixCanvas');
-    if (!canvas) {
-        console.error('Matrix canvas element not found');
-        return;
-    }
-    const ctx = canvas.getContext('2d');
+    // Matrix-like background effect (optional)
+    const canvas = document.createElement('canvas');
+    canvas.id = 'matrixCanvas';
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.zIndex = '-1';
+    canvas.style.pointerEvents = 'none';
+    canvas.style.opacity = '0.1';
+    document.body.appendChild(canvas);
 
+    const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -24,10 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function draw() {
-        ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        ctx.fillStyle = 'rgba(0, 255, 0, 0.15)';
+        ctx.fillStyle = 'rgba(255, 95, 31, 0.8)';
         ctx.font = fontSize + 'px monospace';
 
         for(let i = 0; i < rainDrops.length; i++) {
@@ -48,22 +55,15 @@ document.addEventListener('DOMContentLoaded', () => {
         canvas.height = window.innerHeight;
     });
 
-    const copyButtons = document.querySelectorAll('.copy-button');
-    
-    copyButtons.forEach(button => {
-        button.addEventListener('click', async () => {
-            const value = button.dataset.value;
-            const copyText = button.querySelector('.copy-text');
-            
-            try {
-                await navigator.clipboard.writeText(value);
-                copyText.textContent = 'Copied!';
-                
-                setTimeout(() => {
-                    copyText.textContent = 'Copy';
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy:', err);
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
             }
         });
     });
