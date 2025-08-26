@@ -5,6 +5,7 @@
 #include <ctime>
 #include <algorithm>
 #include <vector>
+#include <fstream>
 
 namespace elizaos {
 
@@ -121,10 +122,14 @@ void AgentLogger::writeToFile(
     std::string separator = std::string(barLength, '=') + header + std::string(barLength, '=');
     std::string footer = std::string(SEPARATOR_WIDTH, '=');
     
-    // Get timestamp
+    // Get timestamp (cross-platform compatible)
     auto now = std::time(nullptr);
     struct tm tm;
-    localtime_r(&now, &tm);
+    #ifdef _WIN32
+        localtime_s(&tm, &now);  // Windows safe version
+    #else
+        localtime_r(&now, &tm);  // POSIX version
+    #endif
     char timestamp[100];
     std::strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", &tm);
     
