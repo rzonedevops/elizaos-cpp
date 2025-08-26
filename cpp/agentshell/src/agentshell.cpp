@@ -126,12 +126,19 @@ ShellCommandResult AgentShell::executeCommand(const std::string& command) {
     std::string commandName = tokens[0];
     
     // Look up command handler
-    std::lock_guard<std::mutex> lock(commandsMutex_);
-    auto it = commandHandlers_.find(commandName);
+    CommandHandler handler;
+    {
+        std::lock_guard<std::mutex> lock(commandsMutex_);
+        auto it = commandHandlers_.find(commandName);
+        
+        if (it != commandHandlers_.end()) {
+            handler = it->second;
+        }
+    }
     
-    if (it != commandHandlers_.end()) {
+    if (handler) {
         try {
-            return it->second(tokens);
+            return handler(tokens);
         } catch (const std::exception& e) {
             return ShellCommandResult(false, "", "Command error: " + std::string(e.what()), 1);
         }
@@ -204,6 +211,8 @@ void AgentShell::initializeBuiltinCommands() {
     registerCommand("clear", [this](const std::vector<std::string>& args) { return clearCommand(args); });
     registerCommand("echo", [this](const std::vector<std::string>& args) { return echoCommand(args); });
     registerCommand("status", [this](const std::vector<std::string>& args) { return statusCommand(args); });
+    registerCommand("version", [this](const std::vector<std::string>& args) { return versionCommand(args); });
+    registerCommand("info", [this](const std::vector<std::string>& args) { return infoCommand(args); });
 }
 
 ShellCommandResult AgentShell::helpCommand(const std::vector<std::string>& args) {
@@ -223,6 +232,8 @@ ShellCommandResult AgentShell::helpCommand(const std::vector<std::string>& args)
         else if (cmd == "clear") ss << " - Clear the screen";
         else if (cmd == "echo") ss << " - Echo text to output";
         else if (cmd == "status") ss << " - Show system status";
+        else if (cmd == "version") ss << " - Show ElizaOS version information";
+        else if (cmd == "info") ss << " - Show detailed system information";
         
         ss << "\n";
     }
@@ -292,6 +303,54 @@ ShellCommandResult AgentShell::statusCommand(const std::vector<std::string>& arg
     return ShellCommandResult(true, ss.str(), "", 0);
 }
 
+ShellCommandResult AgentShell::versionCommand(const std::vector<std::string>& args) {
+    (void)args; // Suppress unused parameter warning
+    
+    std::stringstream ss;
+    ss << "ElizaOS C++ Framework Version 1.0.0\n";
+    ss << "Build: " << __DATE__ << " " << __TIME__ << "\n";
+    ss << "C++ Standard: " << __cplusplus << "\n";
+    ss << "Compiler: ";
+    
+#ifdef __GNUC__
+    ss << "GCC " << __GNUC__ << "." << __GNUC_MINOR__ << "." << __GNUC_PATCHLEVEL__;
+#elif defined(__clang__)
+    ss << "Clang " << __clang_major__ << "." << __clang_minor__ << "." << __clang_patchlevel__;
+#elif defined(_MSC_VER)
+    ss << "MSVC " << _MSC_VER;
+#else
+    ss << "Unknown";
+#endif
+    
+    ss << "\n";
+    return ShellCommandResult(true, ss.str(), "", 0);
+}
+
+ShellCommandResult AgentShell::infoCommand(const std::vector<std::string>& args) {
+    (void)args; // Suppress unused parameter warning
+    
+    std::stringstream ss;
+    ss << "ElizaOS C++ Framework - Advanced Agent System\n";
+    ss << "=============================================\n\n";
+    ss << "Core Components:\n";
+    ss << "  • Agent Shell: Interactive command interface\n";
+    ss << "  • Agent Logger: Comprehensive logging system\n";
+    ss << "  • Agent Memory: Vector-based memory management\n";
+    ss << "  • Agent Communications: Multi-protocol messaging\n";
+    ss << "  • Agent Loop: Event-driven agent execution\n";
+    ss << "  • Agent Actions: Task processing and execution\n\n";
+    ss << "Features:\n";
+    ss << "  • Command-line interface with history\n";
+    ss << "  • Thread-safe operations\n";
+    ss << "  • Extensible command system\n";
+    ss << "  • Real-time agent interaction\n";
+    ss << "  • Integrated logging and monitoring\n\n";
+    ss << "Active Commands: " << getAvailableCommands().size() << "\n";
+    ss << "Shell Status: " << (running_ ? "Running" : "Stopped") << "\n";
+    
+    return ShellCommandResult(true, ss.str(), "", 0);
+}
+
 // Convenience functions
 void startInteractiveShell() {
     globalShell->start();
@@ -308,6 +367,18 @@ bool executeShellCommand(const std::string& command) {
 
 void registerShellCommand(const std::string& name, CommandHandler handler) {
     globalShell->registerCommand(name, handler);
+}
+
+ShellCommandResult executeShellCommandWithResult(const std::string& command) {
+    return globalShell->executeCommand(command);
+}
+
+bool isShellRunning() {
+    return globalShell->isRunning();
+}
+
+std::vector<std::string> getAvailableShellCommands() {
+    return globalShell->getAvailableCommands();
 }
 
 } // namespace elizaos

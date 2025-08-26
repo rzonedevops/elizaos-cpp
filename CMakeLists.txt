@@ -452,6 +452,40 @@ target_link_libraries(registry_demo
     Threads::Threads
 )
 
+# Shell Demo
+add_executable(shell_demo
+    shell_demo.cpp
+)
+
+target_include_directories(shell_demo PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(shell_demo
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-agentcomms
+    elizaos-agentshell
+    Threads::Threads
+)
+
+# AgentShell Integration Test
+add_executable(agentshell_test
+    agentshell_test.cpp
+)
+
+target_include_directories(agentshell_test PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(agentshell_test
+    elizaos-core
+    elizaos-agentlogger
+    elizaos-agentcomms
+    elizaos-agentshell
+    Threads::Threads
+)
+
 # Add example executable (optional)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
@@ -460,7 +494,7 @@ endif()
 # Installation - install all libraries and executables
 install(TARGETS 
     # Main executables
-    eliza
+    eliza shell_demo agentshell_test
     
     # Stage 1-2 - Core and Infrastructure
     elizaos-core elizaos-agentloop elizaos-agentmemory

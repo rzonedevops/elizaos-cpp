@@ -132,6 +132,8 @@ private:
     ShellCommandResult clearCommand(const std::vector<std::string>& args);
     ShellCommandResult echoCommand(const std::vector<std::string>& args);
     ShellCommandResult statusCommand(const std::vector<std::string>& args);
+    ShellCommandResult versionCommand(const std::vector<std::string>& args);
+    ShellCommandResult infoCommand(const std::vector<std::string>& args);
     
     // Member variables
     std::atomic<bool> running_;
@@ -156,5 +158,24 @@ void startInteractiveShell();
 void stopInteractiveShell();
 bool executeShellCommand(const std::string& command);
 void registerShellCommand(const std::string& name, CommandHandler handler);
+
+/**
+ * Execute a command and get the result
+ * @param command Command string to execute
+ * @return Command result structure
+ */
+ShellCommandResult executeShellCommandWithResult(const std::string& command);
+
+/**
+ * Check if interactive shell is currently running
+ * @return true if shell is running, false otherwise
+ */
+bool isShellRunning();
+
+/**
+ * Get list of all available commands
+ * @return Vector of command names
+ */
+std::vector<std::string> getAvailableShellCommands();
 
 } // namespace elizaos
