@@ -1,5 +1,6 @@
 # C++ Build artifacts
 build/
+build_*/
 cmake-build-*/
 *.o
 *.a

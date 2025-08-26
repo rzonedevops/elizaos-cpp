@@ -1,5 +1,0 @@
-if(EXISTS "/home/runner/work/elizaos-cpp/elizaos-cpp/build_release/cpp/tests/elizaos_tests[1]_tests.cmake")
-  include("/home/runner/work/elizaos-cpp/elizaos-cpp/build_release/cpp/tests/elizaos_tests[1]_tests.cmake")
-else()
-  add_test(elizaos_tests_NOT_BUILT elizaos_tests_NOT_BUILT)
-endif()
