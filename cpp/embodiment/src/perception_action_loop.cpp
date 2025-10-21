@@ -3,6 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <algorithm>
+#include <sstream>
 
 namespace elizaos {
 
@@ -31,8 +32,6 @@ namespace elizaos {
     AgentLogger logger;
     logger.log(message, "", "embodiment", LogLevel::WARNING);
 }
-
-namespace elizaos {
 
 /**
  * Perception-Action Loop Implementation
@@ -409,7 +408,7 @@ void PerceptionActionLoop::updateState(const std::vector<std::shared_ptr<Sensory
                 state_->addRecentMessage(memory);
                 
                 try {
-                    memory_->addMemory(memory);
+                    memory_->createMemory(memory);
                 } catch (const std::exception& e) {
                     
                     elogWarning("Failed to store sensory memory: " + std::string(e.what()));

@@ -32,8 +32,6 @@ namespace elizaos {
     logger.log(message, "", "embodiment", LogLevel::WARNING);
 }
 
-namespace elizaos {
-
 /**
  * Embodiment Manager Implementation
  */
@@ -232,7 +230,10 @@ EmbodimentManager::CoherenceReport EmbodimentManager::validateSystemCoherence() 
     } else {
         // Check memory health
         try {
-            auto memories = memory_->searchMemories("test", 1);
+            MemorySearchByEmbeddingParams params;
+            params.embedding = EmbeddingVector(384, 0.0f); // Default empty embedding
+            params.count = 1;
+            auto memories = memory_->searchMemories(params);
             metrics["memory_accessible"] = 1.0;
         } catch (...) {
             warnings.push_back("Memory manager may not be functioning correctly");
