@@ -23,7 +23,7 @@ using namespace elizaos;
 class EmbodimentDemo {
 public:
     EmbodimentDemo() {
-        logger_.logSystem("Initializing Stage 6 Embodiment Demo");
+        logger_.log("Initializing Stage 6 Embodiment Demo", "demo", "embodiment", LogLevel::SYSTEM);
         
         // Create agent configuration
         AgentConfig config;
@@ -45,7 +45,7 @@ public:
     }
     
     void runDemo() {
-        logger_.panel("Stage 6 Demo", "Embodiment & Integration");
+        logger_.log("Stage 6 Demo: Embodiment & Integration", "demo", "embodiment", LogLevel::INFO);
         
         // Test 1: Initialize embodiment system
         testInitialization();
@@ -71,30 +71,31 @@ public:
         // Interactive mode
         runInteractiveMode();
         
-        logger_.logSuccess("Stage 6 Demo completed successfully");
+        logger_.log("Stage 6 Demo completed successfully", "demo", "embodiment", LogLevel::SUCCESS);
     }
     
 private:
     void testInitialization() {
-        logger_.logInfo("=== Test 1: Embodiment System Initialization ===");
+        logger_.log("=== Test 1: Embodiment System Initialization ===", "demo", "embodiment", LogLevel::INFO);
         
         // Initialize memory system
-        if (!memory_->initialize()) {
-            logger_.logError("Failed to initialize memory system");
+        // Memory system is initialized in constructor
+        if (!memory_) {
+            logger_.log("Failed to initialize memory system", "demo", "embodiment", LogLevel::ERROR);
             return;
         }
         
         // Initialize embodiment manager
         if (!embodiment_->initialize()) {
-            logger_.logError("Failed to initialize embodiment manager");
+            logger_.log("Failed to initialize embodiment manager", "demo", "embodiment", LogLevel::ERROR);
             return;
         }
         
-        logger_.logSuccess("Embodiment system initialized successfully");
+        logger_.log("Embodiment system initialized successfully", "demo", "embodiment", LogLevel::SUCCESS);
     }
     
     void testSensoryInterfaces() {
-        logger_.logInfo("=== Test 2: Sensory Interface Testing ===");
+        logger_.log("=== Test 2: Sensory Interface Testing ===", "demo", "embodiment", LogLevel::INFO);
         
         // Create console text interfaces for user input and output
         auto consoleInput = std::make_shared<ConsoleTextInput>();
@@ -109,11 +110,11 @@ private:
             SensoryDataType::ENVIRONMENTAL, envFile);
         embodiment_->registerSensoryInterface(fileInterface);
         
-        logger_.logSuccess("Sensory interfaces registered");
+        logger_.log("Sensory interfaces registered", "demo", "embodiment", LogLevel::SUCCESS);
     }
     
     void testMotorInterfaces() {
-        logger_.logInfo("=== Test 3: Motor Interface Testing ===");
+        logger_.log("=== Test 3: Motor Interface Testing ===", "demo", "embodiment", LogLevel::INFO);
         
         // Create default motor interfaces
         embodiment_->createDefaultInterfaces();
@@ -121,11 +122,11 @@ private:
         // Test individual motor actions
         testMotorActions();
         
-        logger_.logSuccess("Motor interfaces tested successfully");
+        logger_.log("Motor interfaces tested successfully", "demo", "embodiment", LogLevel::SUCCESS);
     }
     
     void testMotorActions() {
-        logger_.logInfo("Testing individual motor actions:");
+        logger_.log("Testing individual motor actions:", "demo", "embodiment", LogLevel::INFO);
         
         // Test speech action
         auto speechAction = std::make_shared<SpeechAction>("Hello, I am an embodied agent!");
@@ -154,18 +155,18 @@ private:
         manipAction->targetPose = {0.5, 0.3, 0.2, 0.0, 0.0, 0.0};
         manipAction->force = 0.7;
         
-        logger_.logInfo("Created test motor actions for validation");
+        logger_.log("Created test motor actions for validation", "demo", "embodiment", LogLevel::INFO);
     }
     
     void testPerceptionActionLoop() {
-        logger_.logInfo("=== Test 4: Perception-Action Loop Configuration ===");
+        logger_.log("=== Test 4: Perception-Action Loop Configuration ===", "demo", "embodiment", LogLevel::INFO);
         
         // Configure loop with 200ms intervals (5 Hz)
         embodiment_->configurePerceptionActionLoop(std::chrono::milliseconds(200));
         
         auto loop = embodiment_->getPerceptionActionLoop();
         if (!loop) {
-            logger_.logError("Failed to get perception-action loop");
+            logger_.log("Failed to get perception-action loop", "demo", "embodiment", LogLevel::ERROR);
             return;
         }
         
@@ -178,11 +179,11 @@ private:
             return this->decideActions(state, sensoryData);
         });
         
-        logger_.logSuccess("Perception-action loop configured");
+        logger_.log("Perception-action loop configured", "demo", "embodiment", LogLevel::SUCCESS);
     }
     
     void testIntegratedSystem() {
-        logger_.logInfo("=== Test 5: Integrated System Testing ===");
+        logger_.log("=== Test 5: Integrated System Testing ===", "demo", "embodiment", LogLevel::INFO);
         
         // Test all integration points
         bool sensoryOk = embodiment_->testSensoryIntegration();
@@ -191,89 +192,84 @@ private:
         bool systemOk = embodiment_->testSystemIntegration();
         
         if (sensoryOk && motorOk && loopOk && systemOk) {
-            logger_.logSuccess("All integration tests passed");
+            logger_.log("All integration tests passed", "demo", "embodiment", LogLevel::SUCCESS);
         } else {
-            logger_.logWarning("Some integration tests failed");
+            logger_.log("Some integration tests failed", "demo", "embodiment", LogLevel::WARNING);
         }
     }
     
     void testSystemCoherence() {
-        logger_.logInfo("=== Test 6: System Coherence Validation ===");
+        logger_.log("=== Test 6: System Coherence Validation ===", "demo", "embodiment", LogLevel::INFO);
         
         auto report = embodiment_->validateSystemCoherence();
         
-        logger_.logInfo("Coherence Report:");
-        logger_.logInfo("  Overall Coherent: " + std::string(report.overallCoherent ? "YES" : "NO"));
-        logger_.logInfo("  Issues: " + std::to_string(report.issues.size()));
-        logger_.logInfo("  Warnings: " + std::to_string(report.warnings.size()));
+        logger_.log("Coherence Report:", "demo", "embodiment", LogLevel::INFO);
+        logger_.log("  Overall Coherent: " + std::string(report.overallCoherent ? "YES" : "NO", "demo", "embodiment", LogLevel::INFO));
+        logger_.log("  Issues: " + std::to_string(report.issues.size(, "demo", "embodiment", LogLevel::INFO)));
+        logger_.log("  Warnings: " + std::to_string(report.warnings.size(, "demo", "embodiment", LogLevel::INFO)));
         
         for (const auto& issue : report.issues) {
-            logger_.logError("  Issue: " + issue);
+            logger_.log("  Issue: " + issue, "demo", "embodiment", LogLevel::ERROR);
         }
         
         for (const auto& warning : report.warnings) {
-            logger_.logWarning("  Warning: " + warning);
+            logger_.log("  Warning: " + warning, "demo", "embodiment", LogLevel::WARNING);
         }
         
-        logger_.logInfo("  Metrics:");
+        logger_.log("  Metrics:", "demo", "embodiment", LogLevel::INFO);
         for (const auto& metric : report.metrics) {
-            logger_.logInfo("    " + metric.first + ": " + std::to_string(metric.second));
+            logger_.log("    " + metric.first + ": " + std::to_string(metric.second, "demo", "embodiment", LogLevel::INFO));
         }
         
         if (report.overallCoherent) {
-            logger_.logSuccess("System coherence validation passed");
+            logger_.log("System coherence validation passed", "demo", "embodiment", LogLevel::SUCCESS);
         } else {
-            logger_.logWarning("System coherence validation found issues");
+            logger_.log("System coherence validation found issues", "demo", "embodiment", LogLevel::WARNING);
         }
     }
     
     void testPerformanceMetrics() {
-        logger_.logInfo("=== Test 7: Performance Metrics ===");
+        logger_.log("=== Test 7: Performance Metrics ===", "demo", "embodiment", LogLevel::INFO);
         
         auto status = embodiment_->getSystemStatus();
         auto metrics = embodiment_->getPerformanceMetrics();
         
-        logger_.logInfo("System Status:");
+        logger_.log("System Status:", "demo", "embodiment", LogLevel::INFO);
         for (const auto& stat : status) {
-            logger_.logInfo("  " + stat.first + ": " + stat.second);
+            logger_.log("  " + stat.first + ": " + stat.second, "demo", "embodiment", LogLevel::INFO);
         }
         
-        logger_.logInfo("Performance Metrics:");
+        logger_.log("Performance Metrics:", "demo", "embodiment", LogLevel::INFO);
         for (const auto& metric : metrics) {
-            logger_.logInfo("  " + metric.first + ": " + std::to_string(metric.second));
+            logger_.log("  " + metric.first + ": " + std::to_string(metric.second, "demo", "embodiment", LogLevel::INFO));
         }
     }
     
     void runInteractiveMode() {
-        logger_.logInfo("=== Interactive Embodied Agent Mode ===");
+        logger_.log("=== Interactive Embodied Agent Mode ===", "demo", "embodiment", LogLevel::INFO);
         
         // Enable continuous validation
         embodiment_->enableContinuousValidation(true, std::chrono::seconds(30));
         
         // Start the embodiment system
         if (!embodiment_->start()) {
-            logger_.logError("Failed to start embodiment system");
+            logger_.log("Failed to start embodiment system", "demo", "embodiment", LogLevel::ERROR);
             return;
         }
         
-        logger_.panel("Interactive Mode", 
-            "The embodied agent is now running!\n"
-            "- Type messages to interact with the agent\n"
-            "- The agent will perceive your input and respond with actions\n"
-            "- System coherence is monitored continuously\n"
-            "- Type 'quit' to exit");
+        logger_.log("Interactive Mode", "demo", "embodiment", LogLevel::INFO);
         
         // Let the system run for demonstration
         std::this_thread::sleep_for(std::chrono::seconds(30));
         
-        logger_.logInfo("Stopping interactive mode...");
+        logger_.log("Stopping interactive mode...", "demo", "embodiment", LogLevel::INFO);
         embodiment_->stop();
     }
     
     void processPerception(const std::vector<std::shared_ptr<SensoryData>>& sensoryData) {
         // Custom perception processing callback
         if (!sensoryData.empty()) {
-            logger_.logInfo("Processing " + std::to_string(sensoryData.size()) + " sensory inputs");
+            logger_.log("Processing " + std::to_string(sensoryData.size(, "demo", "embodiment", LogLevel::INFO)) + " sensory inputs");
             
             // Add to memory and cognition
             for (const auto& data : sensoryData) {
@@ -287,7 +283,7 @@ private:
                             state_->getAgentId()
                         );
                         
-                        memory_->addMemory(memory);
+                        memory_->createMemory(memory);
                         cognition_->integrateMemory(memory);
                     }
                 }
@@ -383,7 +379,7 @@ private:
             file << "24.8,44.1,1013.15,0.72,0.12,-0.06,9.79,0.01,0.03,-0.01\n";
             file.close();
             
-            logger_.logInfo("Created test environmental data file: " + filename);
+            logger_.log("Created test environmental data file: " + filename, "demo", "embodiment", LogLevel::INFO);
         }
     }
     

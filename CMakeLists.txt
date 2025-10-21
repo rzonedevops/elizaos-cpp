@@ -196,24 +196,24 @@ target_link_libraries(stage5_demo
     Threads::Threads
 )
 
-# Stage 6 Demo
-add_executable(stage6_demo
-    demo_stage6.cpp
-)
-
-target_include_directories(stage6_demo PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-)
-
-target_link_libraries(stage6_demo
-    elizaos-core
-    elizaos-agentlogger
-    elizaos-agentloop
-    elizaos-agentmemory
-    elizaos-agentaction
-    # elizaos-embodiment  # TEMPORARILY DISABLED
-    Threads::Threads
-)
+# Stage 6 Demo - TEMPORARILY DISABLED DUE TO BUILD ISSUES
+# add_executable(stage6_demo
+#     demo_stage6.cpp
+# )
+# 
+# target_include_directories(stage6_demo PRIVATE
+#     ${CMAKE_SOURCE_DIR}/include
+# )
+# 
+# target_link_libraries(stage6_demo
+#     elizaos-core
+#     elizaos-agentlogger
+#     elizaos-agentloop
+#     elizaos-agentmemory
+#     elizaos-agentaction
+#     # elizaos-embodiment  # TEMPORARILY DISABLED
+#     Threads::Threads
+# )
 
 # Awesome Eliza Demo
 add_executable(awesome_eliza_demo

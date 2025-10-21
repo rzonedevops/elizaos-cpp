@@ -9,4 +9,5 @@ target_include_directories(elizaos-plugin_specification PUBLIC
 
 target_link_libraries(elizaos-plugin_specification 
     elizaos-core
+    ${CMAKE_DL_LIBS}
 )
