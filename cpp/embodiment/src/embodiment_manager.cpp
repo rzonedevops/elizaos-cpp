@@ -312,6 +312,10 @@ EmbodimentManager::CoherenceReport EmbodimentManager::validateSystemCoherence() 
     return report;
 }
 
+} // End anonymous namespace
+
+namespace elizaos {
+
 void EmbodimentManager::enableContinuousValidation(bool enable, std::chrono::seconds interval) {
     continuousValidation_ = enable;
     validationInterval_ = interval;
